@@ -1,0 +1,832 @@
+{
+  "name": "Math AI",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ef9611a3-d925-490a-aa22-35b1db218212",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0c941bc1-fd11-4af6-bb8e-abab8ece9f04",
+      "name": "Webhook",
+      "webhookId": "ef9611a3-d925-490a-aa22-35b1db218212"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "667f14bc-5b36-41e1-9cf0-becc07c5f79e",
+              "name": "body.tema",
+              "value": "={{ $json.body.tema }}",
+              "type": "string"
+            },
+            {
+              "id": "a4756f07-dba6-4edb-957e-31e7a9a80832",
+              "name": "body.uzdevumu_skaits",
+              "value": "={{ $json.body.uzdevumu_skaits }}",
+              "type": "number"
+            },
+            {
+              "id": "bcde3aa7-5072-42d3-82d8-d4bc05e7235d",
+              "name": "body.piezimes",
+              "value": "={{ $json.body.piezimes }}",
+              "type": "string"
+            },
+            {
+              "id": "7f42eff2-763a-4c35-87ff-0fac37b428c4",
+              "name": "body.location",
+              "value": "={{ $json.body.location }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        160,
+        0
+      ],
+      "id": "7db15677-3985-475e-9ee0-e90da2af0ec4",
+      "name": "Get correct data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9307e1e1-be6a-4af3-8afe-9ec26e8f888f",
+              "leftValue": "={{ $json.body.location }}",
+              "rightValue": "uzdevumi",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        336,
+        0
+      ],
+      "id": "fe7c397c-a024-440c-9d0c-62d06ad379ef",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "content": "#\n### Exercise ai agent --->\n",
+        "height": 80,
+        "width": 182
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        320,
+        -224
+      ],
+      "id": "e07a375e-a70c-4892-b58b-fbd98e4daae1",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "#\n### Weak point ai agent --->\n",
+        "height": 80,
+        "width": 182
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        320,
+        224
+      ],
+      "id": "897f003d-7379-46d9-a756-0d4841dda7ed",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        576,
+        -64
+      ],
+      "id": "e08d7d55-a86e-465f-9137-c5eb105819ba",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "To6WJfgm0DnhUZlp",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        304
+      ],
+      "id": "dfc1a4d5-f8a8-49e4-8009-bfb6964e058e",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "To6WJfgm0DnhUZlp",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool to talk to your knowledge base",
+        "method": "POST",
+        "url": "https://prod-1-data.ke.pinecone.io/assistant/chat/matematika",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Api-Key",
+              "value": "pcsk_5aDsZU_BtAToqdavAyTw8CDwvPjot7F6atVuk8u3eSDMXooLkeZafDor1XaQxoU4yqUs16"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $fromAI('searchQuery') }}\"\n    }\n  ],\n  \"stream\": false,\n  \"model\": \"gpt-4o\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        800,
+        -64
+      ],
+      "id": "6385cd5d-5ba0-45e4-9f3a-5d8b41f373fe",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        928,
+        -208
+      ],
+      "id": "e43b8b43-7006-456d-9af0-c36472ff1e2a",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "content": "#\n### Logging the exercises\n --->\n",
+        "height": 96,
+        "width": 182
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1008,
+        -320
+      ],
+      "id": "0999df20-87d7-4a71-8d17-8046bccc3373",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1GRoLNfX9nXwDE3AIXguPbzX-T_kAIK8kitCVmKIJmt4",
+          "mode": "list",
+          "cachedResultName": "Albert info",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GRoLNfX9nXwDE3AIXguPbzX-T_kAIK8kitCVmKIJmt4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Exercises",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GRoLNfX9nXwDE3AIXguPbzX-T_kAIK8kitCVmKIJmt4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "exercises": "={{ $json.output[0].content[0].text }}"
+          },
+          "matchingColumns": [
+            "exercises"
+          ],
+          "schema": [
+            {
+              "id": "exercises",
+              "displayName": "exercises",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1456,
+        -208
+      ],
+      "id": "238a28ba-6cb0-48d6-9d36-7d322ce4d70b",
+      "name": "Log the questions",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "anXHqnvaWJrA654n",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Make a math exercise using the information provided:\nTopic:  {{ $json.body.tema }}\nExercise amount: {{ $json.body.uzdevumu_skaits }}\nNotes: {{ $json.body.piezimes }}\n\nALL EXERCISES MUST BE IN ENGLISH!",
+        "options": {
+          "systemMessage": "=You are a math exercise generator. When you are given a topic to create exercises for, always remember to check what is included in that topic using the Pinecone Tool.\nYou will also be given the number of exercises and possibly some specific notes for the task.\n\nDo not tell which formulas students must use to solve the exercises, unless it is explicitly mentioned in the Notes.\n\nIf the topic seems too broad or general, that is fine — do not ask the user any follow-up questions. ALWAYS PROVIDE THE GENERATED EXERCISES AND NOTHING ELSE!!!\n\nAll exercises must be formatted in a Card style layout so that they can later be printed with PHP. Each exercise is a separate card.\n\nUse this code:\n<h1 class=\"text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight tracking-tight\">\n    {{ $json.body.tema }}\n</h1>\n<p class=\"text-slate-500 dark:text-slate-400 mt-2 text-base sm:text-lg\">\n    Here are the exercises for the selected topic. Solve each one to check your skills!\n</p>\n<!-- ALWAYS PLACE A BREAK LINE AFTER THE TITLE AND AFTER EACH EXERCISE -->\n<div class=\"mt-4 border-b-2 border-primary/50\"></div>\n\n<div class=\"bg-white dark:bg-[#1c1f27] p-4 rounded-lg shadow-md border border-slate-200 dark:border-[#282e39]\">\n    <p class=\"font-semibold text-slate-900 dark:text-white\">\n        n-th exercise\n    </p>\n</div>\n…and so on, as many exercise card blocks as needed."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        576,
+        -208
+      ],
+      "id": "20bca15f-51f0-4d48-80a7-1ea17c1fb71f",
+      "name": "Exercise AI Generator"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Make a math exercise using the information provided:\nTopics:  {{ $json.body.tema }}\nNotes: {{ $json.body.piezimes }}\n\nALL EXERCISES SHOULD BE IN ENGLISH, IF THEY ARE NOT THEN TRANSLATE THEM",
+        "options": {
+          "systemMessage": "You are a math exercise generator. When you are given a topic to create exercises for, always remember to check what is included in that topic using the Pinecone Tool.\n\nYou need to make one exercise for each topic that has been provided.\n\nDo not tell which formulas students must use to solve the exercises, unless it is explicitly mentioned in the Notes.\n\nIf the topic seems too broad or general, that is fine — do not ask the user any follow-up questions. ALWAYS PROVIDE THE GENERATED EXERCISES AND NOTHING ELSE!!!\n\nALL EXERCISES SHOULD BE IN ENGLISH, IF THEY ARE NOT THEN TRANSLATE THEM\n\nAll exercises must be formatted in a Card style layout so that they can later be printed with PHP. Each exercise is a separate card.\n\n\nUse this code:\n<h1 class=\"text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight tracking-tight\">\n    {{ $json.body.tema }}\n</h1>\n<p class=\"text-slate-500 dark:text-slate-400 mt-2 text-base sm:text-lg\">\n    Here are the exercises for the selected topic. Solve each one to check your skills!\n</p>\n<!-- ALWAYS PLACE A BREAK LINE AFTER THE TITLE AND AFTER EACH EXERCISE -->\n<div class=\"mt-4 border-b-2 border-primary/50\"></div>\n\n<div class=\"bg-white dark:bg-[#1c1f27] p-4 rounded-lg shadow-md border border-slate-200 dark:border-[#282e39]\">\n    <p class=\"font-semibold text-slate-900 dark:text-white\">\n        n-th exercise\n    </p>\n</div>\n…and so on, as many exercise card blocks as needed."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        576,
+        144
+      ],
+      "id": "1a31424f-5ccf-4076-a5ee-5271e489a73d",
+      "name": "Weak Point Exercise generator"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "6be70c37-ce50-4ac9-a4d0-8d43fd9a2684",
+        "responseMode": "responseNode",
+        "options": {
+          "binaryPropertyName": "exercise_file"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        1888,
+        -208
+      ],
+      "id": "0ab5d8e1-2e6e-4153-beac-3e88fdaec411",
+      "name": "Webhook Exercise Checker",
+      "webhookId": "6be70c37-ce50-4ac9-a4d0-8d43fd9a2684"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "text": "Make a description of what has been done in this maths problem detailed as possible, because it will be graded by another ai agent. The written things in the picture CAN BE INCORRECT SO DONT CHANGE ANYTHING MAKE SURE IT IS THE SAME AS IT IS ON THE PAPER",
+        "inputType": "base64",
+        "binaryPropertyName": "exercise_file",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        2096,
+        -368
+      ],
+      "id": "ce204f34-e44f-4bd5-83ad-ef4bd9f8ef16",
+      "name": "Analyze image",
+      "credentials": {
+        "openAiApi": {
+          "id": "To6WJfgm0DnhUZlp",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=The exercises solution:\n {{ $json.content.parts[0].text }}",
+        "options": {
+          "systemMessage": "=You are a maths teacher. You have formulas provided in the Knowledge base tool, Make sure to use that to be completely correct about your grading and checking \n\nYou have to find which exercise this RESEMBLES. You have only been given an exercises solution (can be right or wrong), but you have to find an according exercise from the google sheet.\n\nWhen the exercise is found start. checking the provided solution for the exercise and if it matches the Found exercise criteria.\n\nThe mistakes in the exercise solution need to be explained clearly in detail but in short, not too long, so that it is easy to understand.\n\nIn the case if there are mistakes made in the solution, determine under which topic it implies from the Knowledge base tool. Make sure that topic is very specific. If the mistake is minor, like at the end of the solution there are 2 numbers being divided incorrectly, its not needed to be added to the google sheets row called \"weak_points\". BUT if the mistakes are bigger than that they need to be added to the google sheets row \"weak_points\" making sure the topic short and summerized from the Knowledge base tool.\n\nIf there are no mistakes just return everything is correct and in the google sheets row dont append anything!\n\nAt the end when you are giving feedback be short nothing too fancy just straight to the point. Dont say anything about which exercise it resembles JUST straight up feedback.\n\n-- Make sure when giving feedback also giving a step by step solution on where the student has failed and give the answer\n\n-- ALL EXERCISES SHOULD BE IN ENGLISH, IF THEY ARE NOT THEN TRANSLATE THEM\n\n-- FORMATING THE OUTPUT:\n\n*Output only the inner HTML of #ai-problems replacing ** topic **, ** subtitle ** and repeating the article block for each problem. Do not include any extra text, explanation or markup outside the container.\n\n*CODE THAT YOU CAN TWEAK DEPENDING ON THE SCENARIO:\n\n<!-- Paste this into your system message — instruct the agent to output only the inner HTML of #ai-problems -->\n<!-- TAILWIND TEMPLATE -->\n<div id=\"ai-problems\" class=\"max-w-2xl mx-auto\">\n  <!-- Title area -->\n  <header class=\"mb-6\">\n    <h1 class=\"text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight tracking-tight\">\n      ** topic **           <!-- agent: replace with topic string -->\n    </h1>\n    <p class=\"text-slate-500 dark:text-slate-400 mt-2 text-base sm:text-lg\">\n      ** subtitle **        <!-- e.g. \"Solve each problem to check your skills\" -->\n    </p>\n\n    <!-- ALWAYS put a break line after the title -->\n    <div class=\"mt-4 border-b-2 border-primary/50\"></div>\n  </header>\n\n  <!-- Problems list -->\n  <section class=\"space-y-4\">\n    <!-- Repeat this article block for each problem -->\n    <article class=\"bg-white dark:bg-[#1c1f27] p-4 rounded-lg shadow-md border border-slate-200 dark:border-[#282e39]\">\n      <p class=\"font-semibold text-slate-900 dark:text-white\">\n        1. Problem title or short prompt\n      </p>\n      <p class=\"mt-2 text-sm text-slate-700 dark:text-slate-300\">\n        Problem statement goes here. Use plain text and keep special symbols UTF-8. (No solution unless asked)\n      </p>\n\n      <!-- Optional: small hint (only if requested in notes) -->\n      <!-- <p class=\"mt-3 text-xs text-slate-500 dark:text-slate-400\">Hint: ...</p> -->\n\n      <!-- Always place a break line AFTER each problem card -->\n      <div class=\"mt-4 border-b-2 border-primary/50\"></div>\n    </article>\n    <!-- ...more articles as needed -->\n  </section>\n</div>\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        2304,
+        -208
+      ],
+      "id": "20cf41d3-e552-4b34-832e-f9e94ab8c710",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-pro-preview-03-25",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-pro-preview-03-25"
+        },
+        "text": "Make a description of what has been done in this maths problem detailed as possible, because it will be graded by another ai agent. The written things in the picture CAN BE INCORRECT SO DONT CHANGE ANYTHING MAKE SURE IT IS THE SAME AS IT IS ON THE PAPER",
+        "inputType": "binary",
+        "binaryPropertyName": "exercise_file0",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        2096,
+        -208
+      ],
+      "id": "3189364d-ac25-46c0-938c-92dd57dfd28a",
+      "name": "Analyze an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "p2OgiPH51rKSKFd9",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to find which exercise has the student done",
+        "documentId": {
+          "__rl": true,
+          "value": "1GRoLNfX9nXwDE3AIXguPbzX-T_kAIK8kitCVmKIJmt4",
+          "mode": "list",
+          "cachedResultName": "Albert info",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GRoLNfX9nXwDE3AIXguPbzX-T_kAIK8kitCVmKIJmt4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Exercises",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GRoLNfX9nXwDE3AIXguPbzX-T_kAIK8kitCVmKIJmt4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        2512,
+        16
+      ],
+      "id": "6bb75077-e3d3-446c-a628-c7e0bd8078f1",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "anXHqnvaWJrA654n",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2192,
+        16
+      ],
+      "id": "512e7d86-ae13-4da5-b262-81648b17e073",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "p2OgiPH51rKSKFd9",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool to talk to your knowledge base",
+        "method": "POST",
+        "url": "https://prod-1-data.ke.pinecone.io/assistant/chat/matematika",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Api-Key",
+              "value": "pcsk_5aDsZU_BtAToqdavAyTw8CDwvPjot7F6atVuk8u3eSDMXooLkeZafDor1XaQxoU4yqUs16"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $fromAI('searchQuery') }}\"\n    }\n  ],\n  \"stream\": false,\n  \"model\": \"gpt-4o\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        2352,
+        16
+      ],
+      "id": "21a49078-3bc9-4c23-890e-74c0e13a7f82",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1GRoLNfX9nXwDE3AIXguPbzX-T_kAIK8kitCVmKIJmt4",
+          "mode": "list",
+          "cachedResultName": "Albert info",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GRoLNfX9nXwDE3AIXguPbzX-T_kAIK8kitCVmKIJmt4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1828919576,
+          "mode": "list",
+          "cachedResultName": "weak_points",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GRoLNfX9nXwDE3AIXguPbzX-T_kAIK8kitCVmKIJmt4/edit#gid=1828919576"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Weak_points": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Weak_points__using_to_match_', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "Weak_points"
+          ],
+          "schema": [
+            {
+              "id": "Weak_points",
+              "displayName": "Weak_points",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        2672,
+        16
+      ],
+      "id": "428d370c-af8a-4830-9ece-31361ed6354e",
+      "name": "Append or update row in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "anXHqnvaWJrA654n",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2656,
+        -208
+      ],
+      "id": "20676a6b-5dc2-4063-a6ad-efecb74cd9ef",
+      "name": "Respond to Webhook parbauda uzdevumu"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        912,
+        144
+      ],
+      "id": "cc0f1c30-95e5-4414-9417-fbd5f9bd622d",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Using this output get out only of it only the exercise:  {{ $json.output }}\n\nALL EXERCISES SHOULD BE IN ENGLISH, IF THEY ARE NOT TRANSLATE THEM!"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        1136,
+        -208
+      ],
+      "id": "dc94e978-60ea-4c46-9574-16a3a9b9ab38",
+      "name": "Format exercise",
+      "credentials": {
+        "openAiApi": {
+          "id": "To6WJfgm0DnhUZlp",
+          "name": "Unnamed credential"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get correct data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get correct data": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Exercise AI Generator",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Weak Point Exercise generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Exercise AI Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Weak Point Exercise generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "ai_tool": [
+        [
+          {
+            "node": "Exercise AI Generator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        [
+          {
+            "node": "Format exercise",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Exercise AI Generator": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Exercise Checker": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        []
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook parbauda uzdevumu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weak Point Exercise generator": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format exercise": {
+      "main": [
+        [
+          {
+            "node": "Log the questions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2827cbfb-a7ef-4a10-b2d0-44d29af314c1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "25fad213e6efaa9162ca72bdbb3b7167a59417eb29b5c120ea915ff640da3d95"
+  },
+  "id": "K5n18vxK7lTrTXGz",
+  "tags": []
+}
