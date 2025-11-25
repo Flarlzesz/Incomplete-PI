@@ -148,7 +148,7 @@
             
             try {
                 // Make the API call
-                const response = await fetch('https://incompletepi.app.n8n.cloud/webhook-test/ef9611a3-d925-490a-aa22-35b1db218212', {
+                const response = await fetch('https://incompletepi.app.n8n.cloud/webhook/ef9611a3-d925-490a-aa22-35b1db218212', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
