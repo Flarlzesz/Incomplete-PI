@@ -36,22 +36,6 @@
         }
     </style>
 </head>
-<script>
-function showLoadingPopup() {
-    const popup = document.getElementById("loadingPopup");
-    popup.classList.remove("hidden");
-    document.body.classList.add("overflow-hidden"); 
-
-    // optional: delay to allow popup to render
-    setTimeout(() => {
-        // do nothing, form will continue submitting
-    }, 600);
-
-    return true; // allow form submission
-}
-</script>
-
-
 
 <body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-white font-display">
 
@@ -83,29 +67,31 @@ function showLoadingPopup() {
                                     Choose the topic and exercise amount. If you need to add something specific, prompt it in the notes section!
                                 </p>
                             </div>
-                            <form action="exercises.php" onsubmit="return showLoadingPopup();" method="POST">
-                                    <div class="flex flex-col gap-4">
+                            <form id="exerciseForm">
+                                <div class="flex flex-col gap-4">
                                     <label class="flex flex-col w-full">
                                         <p class="text-slate-800 dark:text-white text-base font-medium leading-normal pb-2">Topic</p>
                                         <input name="tema" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border-slate-300 dark:border-[#3b4354] bg-white dark:bg-[#1c1f27] focus:border-primary dark:focus:border-primary h-14 placeholder:text-slate-400 dark:placeholder:text-[#9da6b9] p-[15px] text-base font-normal leading-normal" 
                                             type="text" 
-                                            value=""/>
+                                            value="" 
+                                            required/>
                                     </label>
 
                                     <label class="flex flex-col w-full">
                                         <p class="text-slate-800 dark:text-white text-base font-medium leading-normal pb-2">Exercise amount</p>
                                         <input name="uzdevumu_skaits" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border-slate-300 dark:border-[#3b4354] bg-white dark:bg-[#1c1f27] focus:border-primary dark:focus:border-primary h-14 placeholder:text-slate-400 dark:placeholder:text-[#9da6b9] p-[15px] text-base font-normal leading-normal" 
                                             type="number" 
-                                            value=""/>
+                                            value="" 
+                                            required/>
                                     </label>
 
                                     <label class="flex flex-col w-full">
                                         <p class="text-slate-800 dark:text-white text-base font-medium leading-normal pb-2">Notes (*not required)</p>
-                                        <textarea name="piezimes" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border-slate-300 dark:border-[#3b4354] bg-white dark:bg-[#1c1f27] focus:border-primary dark:focus:border-primary min-h-36 placeholder:text-slate-400 dark:placeholder:text-[#9da6b9] p-[15px] text-base font-normal leading-normal" ></textarea>
+                                        <textarea name="piezimes" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border-slate-300 dark:border-[#3b4354] bg-white dark:bg-[#1c1f27] focus:border-primary dark:focus:border-primary min-h-36 placeholder:text-slate-400 dark:placeholder:text-[#9da6b9] p-[15px] text-base font-normal leading-normal"></textarea>
                                     </label>
 
                                     <div class="flex flex-col sm:flex-row flex-1 gap-3 flex-wrap justify-start pt-2">
-                                        <button class="flex flex-1 min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">
+                                        <button type="submit" class="flex flex-1 min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">
                                             <span class="truncate">Generate</span>
                                         </button>
                                     </div>
@@ -126,57 +112,71 @@ function showLoadingPopup() {
                                 </div>
 
                                 <div class="flex-grow bg-slate-100 dark:bg-background-dark rounded-lg flex items-center justify-center border border-slate-200 dark:border-[#282e39] p-4">
-                                    <div class="w-full h-full max-w-2xl bg-white dark:bg-slate-900/50 shadow-lg p-8 text-slate-800 dark:text-slate-200 aspect-[8.5/11]">
-                                        <div class="space-y-4">
-                                        <?php
-                                            if ($_SERVER["REQUEST_METHOD"] === "POST") {
-                                                
-                                                $url = "https://incompletepi.app.n8n.cloud/webhook-test/ef9611a3-d925-490a-aa22-35b1db218212";
-
-                                                $data = [
-                                                    "tema" => $_POST["tema"] ?? '',
-                                                    "uzdevumu_skaits" => $_POST["uzdevumu_skaits"] ?? '',
-                                                    "piezimes" => $_POST["piezimes"] ?? '',
-                                                    "location" => "uzdevumi"
-                                                ];
-
-                                                $payload = json_encode($data);
-
-                                                $ch = curl_init($url);
-                                                curl_setopt_array($ch, [
-                                                    CURLOPT_POST => true,
-                                                    CURLOPT_POSTFIELDS => $payload,
-                                                    CURLOPT_HTTPHEADER => [
-                                                        'Content-Type: application/json'
-                                                    ],
-                                                    CURLOPT_RETURNTRANSFER => true,
-                                                    CURLOPT_TIMEOUT => 30
-                                                ]);
-
-                                                $response = curl_exec($ch);
-                                                curl_close($ch);
-                                                
-                                                $decoded_response = json_decode($response, true); 
-                                                echo $decoded_response[0]['output'];  
-
-                                            }
-                                            ?>
+                                    <div id="previewContent" class="w-full h-full max-w-2xl bg-white dark:bg-slate-900/50 shadow-lg p-8 text-slate-800 dark:text-slate-200 aspect-[8.5/11]">
+                                        <div class="space-y-4 text-slate-500 dark:text-slate-400 text-center">
+                                            <p>Fill out the form and click "Generate" to see your exercises here.</p>
                                         </div>
                                     </div>
                                 </div>
-
-                                
                             </div>
-                            
                         </div>
 
                     </div>
                 </main>
 
             </main>
-        </main>
+        </div>
     </div>
-</div>
+
+    <script>
+        document.getElementById('exerciseForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); // Prevent default form submission
+            
+            // Show loading popup
+            const popup = document.getElementById('loadingPopup');
+            popup.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+            
+            // Get form data
+            const formData = new FormData(this);
+            const data = {
+                tema: formData.get('tema'),
+                uzdevumu_skaits: formData.get('uzdevumu_skaits'),
+                piezimes: formData.get('piezimes'),
+                location: 'uzdevumi'
+            };
+            
+            try {
+                // Make the API call
+                const response = await fetch('https://incompletepi.app.n8n.cloud/webhook-test/ef9611a3-d925-490a-aa22-35b1db218212', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                // Update preview with response
+                const previewContent = document.getElementById('previewContent');
+                if (result && result[0] && result[0].output) {
+                    previewContent.innerHTML = '<div class="space-y-4">' + result[0].output + '</div>';
+                } else {
+                    previewContent.innerHTML = '<div class="space-y-4 text-red-500">Error: Invalid response from server</div>';
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                const previewContent = document.getElementById('previewContent');
+                previewContent.innerHTML = '<div class="space-y-4 text-red-500">Error: Failed to generate exercises. Please try again.</div>';
+            } finally {
+                // Hide loading popup
+                popup.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
+        });
+    </script>
 
 </body>
 </html>
