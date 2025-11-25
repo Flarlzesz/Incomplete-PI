@@ -133,7 +133,7 @@
         
         try {
             // Make the API call
-            const response = await fetch('https://incompletepi.app.n8n.cloud/webhook-test/6be70c37-ce50-4ac9-a4d0-8d43fd9a2684', {
+            const response = await fetch('https://incompletepi.app.n8n.cloud/webhook/6be70c37-ce50-4ac9-a4d0-8d43fd9a2684', {
                 method: 'POST',
                 body: uploadData
             });
