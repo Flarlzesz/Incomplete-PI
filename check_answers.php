@@ -112,7 +112,7 @@
                                         $fileTmpPath = $_FILES['exercise']['tmp_name'];
                                         $fileName = $_FILES['exercise']['name'];
 
-                                        $url = "https://valtersadrians.app.n8n.cloud/webhook-test/6be70c37-ce50-4ac9-a4d0-8d43fd9a2684";
+                                        $url = "https://incompletepi.app.n8n.cloud/webhook-test/6be70c37-ce50-4ac9-a4d0-8d43fd9a2684";
 
                                         $postFields = [
                                             'exercise_file' => new CURLFile($fileTmpPath, $_FILES['exercise']['type'], $fileName)
