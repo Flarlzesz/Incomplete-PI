@@ -11,4 +11,4 @@ COPY . /app
 EXPOSE 10000
 
 # Command to run your PHP app
-CMD ["php", "-S", "0.0.0.0:10000", "-t", "."]
+CMD ["php", "-S", "0.0.0.0:10000", "-t", ".", "router.php"]
