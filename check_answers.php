@@ -23,14 +23,6 @@
         }
     </script>
     <style> body { font-family: 'Lexend', sans-serif; } </style>
-
-    <script>
-    function showLoadingPopup() {
-        document.getElementById("loadingPopup").classList.remove("hidden");
-        document.body.classList.add("overflow-hidden");
-        return true;
-    }
-    </script>
 </head>
 
 <body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-white font-display">
@@ -65,11 +57,11 @@
 
                     <div class="border-b-2 border-primary/50"></div>
 
-                    <form method="POST" action="check_answers.php" onsubmit="return showLoadingPopup();" enctype="multipart/form-data" class="flex flex-col gap-6">
+                    <form id="uploadForm" class="flex flex-col gap-6">
 
                         <label class="flex flex-col">
                             <span class="text-base font-medium">Choose the file</span>
-                            <input name="exercise" type="file" accept=".pdf,.png,.jpg,.jpeg"
+                            <input name="exercise" type="file" accept=".pdf,.png,.jpg,.jpeg" required
                                 class="block w-full text-sm text-slate-900 dark:text-slate-200 
                                 file:mr-4 file:py-3 file:px-4 file:rounded-lg file:border-0
                                 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/90
@@ -97,42 +89,13 @@
                         </button>
                     </div>
 
-                    <div class="lg:col-span-8 col-span-full border border-slate-200 dark:border-[#282e39] rounded-lg 
+                    <div id="previewContent" class="lg:col-span-8 col-span-full border border-slate-200 dark:border-[#282e39] rounded-lg 
                         bg-slate-100 dark:bg-slate-900/40 
                         min-h-[600px]
                         flex items-center justify-center p-6">   
-                        <?php
-                            if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
-                                $data = [
-                                    "student_exercise" => $_POST["tema"] ?? '',
-                                ];
-
-                                    if (isset($_FILES['exercise']) && $_FILES['exercise']['error'] === 0) {
-                                        $fileTmpPath = $_FILES['exercise']['tmp_name'];
-                                        $fileName = $_FILES['exercise']['name'];
-
-                                        $url = "https://incompletepi.app.n8n.cloud/webhook-test/6be70c37-ce50-4ac9-a4d0-8d43fd9a2684";
-
-                                        $postFields = [
-                                            'exercise_file' => new CURLFile($fileTmpPath, $_FILES['exercise']['type'], $fileName)
-                                        ];
-
-                                        $ch = curl_init($url);
-                                        curl_setopt($ch, CURLOPT_POST, true);
-                                        curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
-                                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-                                        $response = curl_exec($ch);
-                                        curl_close($ch);
-
-                                        // Directly output whatever n8n returns
-                                        $decoded_response = json_decode($response, true); // true = asociatīvs masīvs
-                                        echo $decoded_response[0]['output']; 
-                                    }
-                                }
-                            
-                        ?>
+                        <div class="text-slate-500 dark:text-slate-400 text-center">
+                            <p>Upload a file to see the results here.</p>
+                        </div>
                     </div>
 
                 </div>
@@ -142,6 +105,60 @@
 
     </div>
 </div>
+
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+        e.preventDefault(); // Prevent default form submission
+        
+        // Show loading popup
+        const popup = document.getElementById('loadingPopup');
+        popup.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+        
+        // Get form data
+        const formData = new FormData(this);
+        const fileInput = this.querySelector('input[name="exercise"]');
+        
+        // Check if file is selected
+        if (!fileInput.files || fileInput.files.length === 0) {
+            alert('Please select a file');
+            popup.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+            return;
+        }
+        
+        // Prepare form data for upload
+        const uploadData = new FormData();
+        uploadData.append('exercise_file', fileInput.files[0]);
+        
+        try {
+            // Make the API call
+            const response = await fetch('https://incompletepi.app.n8n.cloud/webhook-test/6be70c37-ce50-4ac9-a4d0-8d43fd9a2684', {
+                method: 'POST',
+                body: uploadData
+            });
+            
+            const result = await response.json();
+            
+            // Update preview with response
+            const previewContent = document.getElementById('previewContent');
+            if (result && result[0] && result[0].output) {
+                previewContent.innerHTML = result[0].output;
+            } else {
+                previewContent.innerHTML = '<div class="text-red-500">Error: Invalid response from server</div>';
+            }
+            
+        } catch (error) {
+            console.error('Error:', error);
+            const previewContent = document.getElementById('previewContent');
+            previewContent.innerHTML = '<div class="text-red-500">Error: Failed to check exercises. Please try again.</div>';
+        } finally {
+            // Hide loading popup
+            popup.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+    });
+</script>
 
 </body>
 </html>
