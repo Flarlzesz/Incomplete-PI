@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: my-php-app      # Tavs projekta nosaukums Render
+    env: docker
+    repo: https://github.com/TAVS-USERNAME/TAVS-REPO
+    branch: main          # branch, ko deploy
+    plan: free
+    dockerfilePath: Dockerfile
+    autoDeploy: true
+    ports:
+      - 10000
