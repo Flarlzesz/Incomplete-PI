@@ -39,13 +39,18 @@
 <script>
 function showLoadingPopup() {
     const popup = document.getElementById("loadingPopup");
-    if (popup) {
-        popup.classList.remove("hidden");
-        document.body.classList.add("overflow-hidden");
-    }
-    return true; // allow the form to submit normally
+    popup.classList.remove("hidden");
+    document.body.classList.add("overflow-hidden"); 
+
+    // optional: delay to allow popup to render
+    setTimeout(() => {
+        // do nothing, form will continue submitting
+    }, 600);
+
+    return true; // allow form submission
 }
 </script>
+
 
 
 <body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-white font-display">
