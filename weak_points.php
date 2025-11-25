@@ -146,7 +146,7 @@ function showLoadingPopup() {
                                     
                                     if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                         // Your n8n webhook URL
-                                        $url = "https://valtersadrians.app.n8n.cloud/webhook-test/ef9611a3-d925-490a-aa22-35b1db218212";
+                                        $url = "https://incompletepi.app.n8n.cloud/webhook-test/ef9611a3-d925-490a-aa22-35b1db218212";
                                         
                                         $weakPoints = new getWeakPoints();
                                         $weakPointData = $weakPoints->getWeakPoints();
