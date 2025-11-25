@@ -40,6 +40,10 @@
 function showLoadingPopup() {
     document.getElementById("loadingPopup").classList.remove("hidden");
     document.body.classList.add("overflow-hidden"); 
+        // optional: delay to allow popup to render
+    setTimeout(() => {
+        // do nothing, form will continue submitting
+    }, 50);
     return true;
 }
 </script>
@@ -74,7 +78,7 @@ function showLoadingPopup() {
                                     Choose the topic and exercise amount. If you need to add something specific, prompt it in the notes section!
                                 </p>
                             </div>
-                            <form action="exercises.php" onsubmit="return showLoadingPopup();" method="POST">
+                            <form action="exercises.php" onsubmit="return showLoadingPopup(); return true;" method="POST">
                                     <div class="flex flex-col gap-4">
                                     <label class="flex flex-col w-full">
                                         <p class="text-slate-800 dark:text-white text-base font-medium leading-normal pb-2">Topic</p>
