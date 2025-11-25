@@ -30,13 +30,6 @@
         },
     }
 </script>
-<script>
-function showLoadingPopup() {
-    document.getElementById("loadingPopup").classList.remove("hidden");
-    document.body.classList.add("overflow-hidden"); 
-    return true; 
-}
-</script>
 <style>
     body {
         font-family: 'Lexend', sans-serif;
@@ -56,7 +49,7 @@ function showLoadingPopup() {
 <div id="loadingPopup" class="hidden fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50">
     <div class="bg-white dark:bg-[#111318] border border-slate-200 dark:border-[#282e39] rounded-xl p-8 w-[380px] flex flex-col items-center gap-4 shadow-xl">
         <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
-        <p class="text-slate-900 dark:text-white text-lg font-semibold text-center">Your file is beeing generated...</p>
+        <p class="text-slate-900 dark:text-white text-lg font-semibold text-center">Your file is being generated...</p>
         <p class="text-slate-500 dark:text-slate-400 text-sm text-center">Please wait a few seconds</p>
     </div>
 </div>
@@ -107,7 +100,7 @@ function showLoadingPopup() {
                         <p class="text-slate-500 dark:text-[#9da6b9] text-base font-normal leading-normal">Choose a topic and number of exercises, and I'll create a worksheet for you in PDF format.</p>
                     </div>
                     
-                    <form method="POST" action="weak_points.php" onsubmit="return showLoadingPopup();" class="flex flex-col gap-4">
+                    <form id="weakPointsForm" class="flex flex-col gap-4">
 
                         <label class="flex flex-col w-full">
                             <p class="text-slate-800 dark:text-white text-base font-medium leading-normal pb-2">Notes (optional)</p>
@@ -139,49 +132,9 @@ function showLoadingPopup() {
                         </div>
                         
                         <div class="flex-grow bg-slate-100 dark:bg-background-dark rounded-lg flex items-center justify-center border border-slate-200 dark:border-[#282e39] p-4 min-h-[600px]">
-                            <div class="w-full h-full max-w-2xl bg-white dark:bg-slate-900/50 shadow-lg p-8 text-slate-800 dark:text-slate-200 rounded">
-                                <div class="space-y-6">
-                                    <?php
-                                    require_once "getWeakPoints.php";
-                                    
-                                    if ($_SERVER["REQUEST_METHOD"] === "POST") {
-                                        // Your n8n webhook URL
-                                        $url = "https://incompletepi.app.n8n.cloud/webhook-test/ef9611a3-d925-490a-aa22-35b1db218212";
-                                        
-                                        $weakPoints = new getWeakPoints();
-                                        $weakPointData = $weakPoints->getWeakPoints();
-
-                                        // Data to send
-                                        $data = [
-                                            "tema" => $weakPointData ?? '',
-                                            "uzdevumu_skaits" => $_POST["uzdevumu_skaits"] ?? '',
-                                            "piezimes" => $_POST["piezimes"] ?? '',
-                                            "location" => "weak_points_uzdevumi"
-                                        ];
-
-                                        // Encode to JSON
-                                        $payload = json_encode($data);
-
-                                        // Initialize cURL
-                                        $ch = curl_init($url);
-                                        curl_setopt_array($ch, [
-                                            CURLOPT_POST => true,
-                                            CURLOPT_POSTFIELDS => $payload,
-                                            CURLOPT_HTTPHEADER => [
-                                                'Content-Type: application/json'
-                                            ],
-                                            CURLOPT_RETURNTRANSFER => true,
-                                            CURLOPT_TIMEOUT => 30
-                                        ]);
-
-                                        // Execute request and get response
-                                        $response = curl_exec($ch);
-                                        curl_close($ch);
-                                        
-                                        $decoded_response = json_decode($response, true); // true = asociatīvs masīvs
-                                        echo $decoded_response[0]['output'];  
-                                    }
-                                    ?>
+                            <div id="previewContent" class="w-full h-full max-w-2xl bg-white dark:bg-slate-900/50 shadow-lg p-8 text-slate-800 dark:text-slate-200 rounded">
+                                <div class="space-y-6 text-slate-500 dark:text-slate-400 text-center">
+                                    <p>Click "Generate" to create exercises based on your weak points.</p>
                                 </div>
                             </div>
                         </div>
@@ -191,5 +144,68 @@ function showLoadingPopup() {
         </div>
     </main>
 </div>
+
+<script>
+    document.getElementById('weakPointsForm').addEventListener('submit', async function(e) {
+        e.preventDefault(); // Prevent default form submission
+        
+        // Show loading popup
+        const popup = document.getElementById('loadingPopup');
+        popup.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+        
+        try {
+            // First, get weak points data from PHP
+            const weakPointsResponse = await fetch('getWeakPoints.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            const weakPointsData = await weakPointsResponse.json();
+            
+            // Get form data
+            const formData = new FormData(this);
+            
+            // Prepare data for n8n webhook
+            const data = {
+                tema: weakPointsData.weakPoints || '',
+                uzdevumu_skaits: formData.get('uzdevumu_skaits') || '',
+                piezimes: formData.get('notes') || '',
+                location: 'weak_points_uzdevumi'
+            };
+            
+            // Make the API call to n8n
+            const response = await fetch('https://incompletepi.app.n8n.cloud/webhook-test/ef9611a3-d925-490a-aa22-35b1db218212', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            // Update preview with response
+            const previewContent = document.getElementById('previewContent');
+            if (result && result[0] && result[0].output) {
+                previewContent.innerHTML = '<div class="space-y-6">' + result[0].output + '</div>';
+            } else {
+                previewContent.innerHTML = '<div class="space-y-6 text-red-500">Error: Invalid response from server</div>';
+            }
+            
+        } catch (error) {
+            console.error('Error:', error);
+            const previewContent = document.getElementById('previewContent');
+            previewContent.innerHTML = '<div class="space-y-6 text-red-500">Error: Failed to generate exercises. Please try again.</div>';
+        } finally {
+            // Hide loading popup
+            popup.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+    });
+</script>
+
 </body>
 </html>
